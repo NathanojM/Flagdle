@@ -57,5 +57,5 @@ fig.update_ternaries(
     caxis_title="Blue")
 
 
-fig.write_html("index.html")
+fig.write_html("flag.html")
 fig.show()  
