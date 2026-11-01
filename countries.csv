@@ -1,0 +1,176 @@
+Country,ISO,Continent
+Algeria,DZ,Africa
+Angola,AO,Africa
+Benin,BJ,Africa
+Botswana,BW,Africa
+Burkina Faso,BF,Africa
+Burundi,BI,Africa
+Cameroon,CM,Africa
+Central African Republic,CF,Africa
+Chad,TD,Africa
+Democratic Republic of the Congo,CD,Africa
+Djibouti,DJ,Africa
+Egypt,EG,Africa
+Equatorial Guinea,GQ,Africa
+Eritrea,ER,Africa
+eSwatini,SZ,Africa
+Ethiopia,ET,Africa
+Gabon,GA,Africa
+Gambia,GM,Africa
+Ghana,GH,Africa
+Guinea,GN,Africa
+Guinea-Bissau,GW,Africa
+Ivory Coast,CI,Africa
+Kenya,KE,Africa
+Lesotho,LS,Africa
+Liberia,LR,Africa
+Libya,LY,Africa
+Madagascar,MG,Africa
+Malawi,MW,Africa
+Mali,ML,Africa
+Mauritania,MR,Africa
+Morocco,MA,Africa
+Mozambique,MZ,Africa
+Namibia,NA,Africa
+Niger,NE,Africa
+Nigeria,NG,Africa
+Republic of the Congo,CG,Africa
+Rwanda,RW,Africa
+Senegal,SN,Africa
+Sierra Leone,SL,Africa
+Somalia,SO,Africa
+South Africa,ZA,Africa
+South Sudan,SS,Africa
+Sudan,SD,Africa
+Togo,TG,Africa
+Tunisia,TN,Africa
+Uganda,UG,Africa
+United Republic of Tanzania,TZ,Africa
+Western Sahara,EH,Africa
+Zambia,ZM,Africa
+Zimbabwe,ZW,Africa
+Antarctica,AQ,Antarctica
+Afghanistan,AF,Asia
+Armenia,AM,Asia
+Azerbaijan,AZ,Asia
+Bangladesh,BD,Asia
+Bhutan,BT,Asia
+China,CN,Asia
+India,IN,Asia
+Japan,JP,Asia
+Kazakhstan,KZ,Asia
+Kyrgyzstan,KG,Asia
+Mongolia,MN,Asia
+Myanmar,MM,Asia
+Nepal,NP,Asia
+North Korea,KP,Asia
+Pakistan,PK,Asia
+Russia,RU,Europe
+South Korea,KR,Asia
+Sri Lanka,LK,Asia
+Taiwan,CN-TW,Asia
+Tajikistan,TJ,Asia
+Turkmenistan,TM,Asia
+Uzbekistan,UZ,Asia
+Cuba,CU,Caribbean
+Dominican Republic,DO,Caribbean
+Haiti,HT,Caribbean
+Jamaica,JM,Caribbean
+The Bahamas,BS,Caribbean
+Trinidad and Tobago,TT,Caribbean
+Puerto Rico,PR,Caribbean
+Albania,AL,Europe
+Belarus,BY,Europe
+Bosnia and Herzegovina,BA,Europe
+Austria,AT,Europe
+Belgium,BE,Europe
+Bulgaria,BG,Europe
+Croatia,HR,Europe
+Cyprus,CY,Europe
+Czechia,CZ,Europe
+Estonia,EE,Europe
+France,TF,Europe
+France,FR,Europe
+France,NC,Europe
+Georgia,GE,Europe
+Germany,DE,Europe
+Greece,GR,Europe
+Hungary,HU,Europe
+Ireland,IE,Europe
+Italy,IT,Europe
+Kosovo,-,Europe
+Latvia,LV,Europe
+Lithuania,LT,Europe
+Luxembourg,LU,Europe
+Moldova,MD,Europe
+Montenegro,ME,Europe
+Netherlands,NL,Europe
+North Macedonia,MK,Europe
+Poland,PL,Europe
+Portugal,PT,Europe
+Serbia,RS,Europe
+Romania,RO,Europe
+Slovakia,SK,Europe
+Slovenia,SI,Europe
+Spain,ES,Europe
+Switzerland,CH,Europe
+Ukraine,UA,Europe
+United Kingdom,GB,Europe
+East Timor,TL,SE Asia
+Fiji,FJ,Oceania
+Iran,IR,Middle East
+Iraq,IQ,Middle East
+Israel,IL,Middle East
+Palestine,PS,Middle East
+Jordan,JO,Middle East
+Kuwait,KW,Middle East
+Lebanon,LB,Middle East
+Oman,OM,Middle East
+Qatar,QA,Middle East
+Saudi Arabia,SA,Middle East
+Syria,SY,Middle East
+Turkey,TR,Middle East
+United Arab Emirates,AE,Middle East
+Yemen,YE,Middle East
+Canada,CA,North America
+Mexico,MX,North America
+United States of America,US,North America
+Australia,AU,Oceania
+New Zealand,NZ,Oceania
+Papua New Guinea,PG,Oceania
+Solomon Islands,SB,Oceania
+Vanuatu,VU,Oceania
+Denmark,GL,Scandinavia
+Denmark,DK,Scandinavia
+Finland,FI,Scandinavia
+Iceland,IS,Scandinavia
+Norway,NO,Scandinavia
+Sweden,SE,Scandinavia
+Brunei,BN,SE Asia
+Cambodia,KH,SE Asia
+Indonesia,ID,SE Asia
+Laos,LA,SE Asia
+Malaysia,MY,SE Asia
+Philippines,PH,SE Asia
+Thailand,TH,SE Asia
+Vietnam,VN,SE Asia
+Argentina,AR,South America
+Belize,BZ,South America
+Bolivia,BO,South America
+Brazil,BR,South America
+Chile,CL,South America
+Colombia,CO,South America
+Costa Rica,CR,South America
+Ecuador,EC,South America
+El Salvador,SV,South America
+Guatemala,GT,South America
+Guyana,GY,South America
+Honduras,HN,South America
+Nicaragua,NI,South America
+Panama,PA,South America
+Paraguay,PY,South America
+Peru,PE,South America
+Suriname,SR,South America
+Falklands,FK,South America
+Uruguay,UY,South America
+Venezuela,VE,South America
