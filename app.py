@@ -2,60 +2,117 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import random
-import numpy as np
-import urllib.request
-from PIL import Image
 from difflib import SequenceMatcher
 from operator import itemgetter
-from io import BytesIO
 
-st.title("Guess the Flag")
+# ----------------------------
+# PAGE SETUP
+# ----------------------------
 
-table = pd.read_csv("flagtable.csv")
-
-
-table["rgb"] = table["r"].astype(str)+","+table["g"].astype(str)+","+table["b"].astype(str)
-table.loc[table["rgb"]=="0,0,0", ["r", "g", "b"]] = 1
-table["rgb"] = table.apply(
-    lambda row: f"#{int(row['r']):02x}{int(row['g']):02x}{int(row['b']):02x}",
-    axis=1
+st.set_page_config(
+    page_title="Guess the Flag",
+    page_icon="🏳️",
+    layout="wide"
 )
-'''
-table["rgb"] = table["r"].astype(str)+","+table["g"].astype(str)+","+table["b"].astype(str)
 
-table.loc[table["rgb"]=="0,0,0", "r"] = 1
-table.loc[table["rgb"]=="0,0,0", "g"] = 1
-table.loc[table["rgb"]=="0,0,0", "b"] = 1
-'''
-def rgb_to_hex(rgb):
-    r, g, b = map(int, rgb.split(","))
-    return f"#{r:02x}{g:02x}{b:02x}"
+st.title("🏳️ Guess the Flag!")
+st.write("Can you identify the country from its flag's RGB colour composition?")
+st.write("You have six guesses. Good luck!")
 
-table["rgb"] = table["rgb"].apply(rgb_to_hex)
-allcountries = table
+# ----------------------------
+# LOAD DATA
+# ----------------------------
 
-# Initialise game state only once
-if "started" not in st.session_state:
-    st.session_state.started = True
-    st.session_state.country_table = table.loc[
-        table["Country"] == str(random.choice(table["Country"]))
-    ].copy()
+@st.cache_data
+def load_data():
+    table = pd.read_csv("flagtable.csv")
+
+    table["r"] = pd.to_numeric(table["r"])
+    table["g"] = pd.to_numeric(table["g"])
+    table["b"] = pd.to_numeric(table["b"])
+
+    # Make black visible
+    black = (
+        (table["r"] == 0) &
+        (table["g"] == 0) &
+        (table["b"] == 0)
+    )
+
+    table.loc[black, ["r", "g", "b"]] = 1
+
+    # Convert RGB to hexadecimal
+    table["rgb"] = table.apply(
+        lambda row: "#{:02x}{:02x}{:02x}".format(
+            int(row["r"]),
+            int(row["g"]),
+            int(row["b"])
+        ),
+        axis=1
+    )
+
+    return table
+
+
+try:
+    allcountries = load_data()
+except Exception as e:
+    st.error(f"Could not load flagtable.csv: {e}")
+    st.stop()
+
+
+# ----------------------------
+# START / RESET GAME
+# ----------------------------
+
+def new_game():
+    country = random.choice(allcountries["Country"].dropna().unique())
+
+    st.session_state.country = country
     st.session_state.guesses = 0
-    st.session_state.finished = False
-    st.session_state.answer = None
+    st.session_state.game_over = False
+    st.session_state.won = False
+    st.session_state.message = ""
 
-table = st.session_state.country_table.copy()
 
-table = table.loc[table["%"] >= 0.1]
-table.loc[table["%"] <= 1, ["%"]] = 3
+if "country" not in st.session_state:
+    new_game()
+
+
+# ----------------------------
+# PREPARE SELECTED FLAG
+# ----------------------------
+
+table = allcountries[
+    allcountries["Country"] == st.session_state.country
+].copy()
+
+table = table[table["%"] >= 0.1].copy()
+
+table.loc[table["%"] <= 1, "%"] = 3
+
 table = table.sort_values(by="%", ascending=False)
 
+
+# ----------------------------
+# CREATE RGB CHART
+# ----------------------------
+
 fig = go.Figure()
+
 fig.add_trace(go.Scatterternary(
-    a=table["r"], b=table["g"], c=table["b"],
+    a=table["r"],
+    b=table["g"],
+    c=table["b"],
     mode="markers+lines",
-    marker=dict(color=table["rgb"], size=table["%"]/100, opacity=1),
-    line=dict(color="lightgray"), text="", textposition="middle center"
+
+    marker=dict(
+        color=table["rgb"],
+        size=table["%"] / 100,
+        opacity=1
+    ),
+
+    line=dict(color="lightgray"),
+    text=""
 ))
 
 fig.update_ternaries(
@@ -63,174 +120,132 @@ fig.update_ternaries(
     baxis_title="Green",
     caxis_title="Blue"
 )
-fig.update_layout(width=1000, height=1000)
 
-st.plotly_chart(fig, use_container_width=True)
+fig.update_layout(
+    height=650,
+    margin=dict(l=40, r=40, t=30, b=30)
+)
 
-for x in table["Country"]:
-    c = x.upper()
 
-countries = []
-for i in allcountries["Country"]:
-    countries.append(i.upper())
+# ----------------------------
+# DISPLAY GAME
+# ----------------------------
 
-# Guess input
-if not st.session_state.finished:
+left, right = st.columns([2, 1])
 
-    with st.form("guess_form"):
-        guess = st.text_input("Enter guess here:")
-        submitted = st.form_submit_button("Submit guess")
+with left:
+    st.plotly_chart(fig, use_container_width=True)
 
-    if submitted and guess:
+with right:
 
-        guess = guess.upper()
+    st.subheader("Your guess")
 
-        if guess not in countries:
-            st.write("Not a valid country")
+    remaining = 6 - st.session_state.guesses
 
-            matches = []
-            for country in countries:
-                res = SequenceMatcher(None, guess.upper(), country.upper()).ratio()
-                match = {"country": country, "res": res}
-                if match not in matches:
-                    matches.append(match)
+    st.metric("Guesses remaining", remaining)
 
-            matches = sorted(matches, key=itemgetter('res'), reverse=True)
-            st.write("Did you mean?")
+    st.progress(remaining / 6)
 
-            matches = matches[:3]
-            for m in matches:
-                st.write(m["country"])
+    if not st.session_state.game_over:
 
-        elif guess == c:
-            st.session_state.guesses += 1
-            st.write(
-                f"Correct! You guessed the flag in "
-                f"{st.session_state.guesses} guesses."
+        with st.form("guess_form"):
+
+            guess = st.text_input(
+                "Enter a country:",
+                placeholder="e.g. France"
             )
-            st.session_state.finished = True
 
-        else:
-            st.session_state.guesses += 1
+            submitted = st.form_submit_button("Submit guess")
 
-        # Preserve the original six-guess limit
-        if st.session_state.guesses >= 6:
-            st.session_state.finished = True
+        if submitted and guess.strip():
 
+            guess = guess.strip().upper()
+
+            countries = (
+                allcountries["Country"]
+                .dropna()
+                .str.upper()
+                .unique()
+                .tolist()
+            )
+
+            if guess not in countries:
+
+                matches = []
+
+                for country in countries:
+                    similarity = SequenceMatcher(
+                        None, guess, country
+                    ).ratio()
+
+                    matches.append({
+                        "country": country,
+                        "res": similarity
+                    })
+
+                matches = sorted(
+                    matches,
+                    key=itemgetter("res"),
+                    reverse=True
+                )
+
+                st.warning("Not a valid country.")
+
+                st.write("Did you mean?")
+
+                for match in matches[:3]:
+                    st.write("- " + match["country"].title())
+
+            elif guess == st.session_state.country.upper():
+
+                st.session_state.guesses += 1
+                st.session_state.won = True
+                st.session_state.game_over = True
+
+                st.success(
+                    f"Correct! You guessed it in "
+                    f"{st.session_state.guesses} guesses!"
+                )
+
+            else:
+
+                st.session_state.guesses += 1
+
+                if st.session_state.guesses >= 6:
+                    st.session_state.game_over = True
+
+                    st.error("Game over! You've used all six guesses.")
+
+                else:
+                    st.error("Incorrect! Try again.")
+
+            st.rerun()
+
+
+# ----------------------------
+# REVEAL ANSWER
+# ----------------------------
+
+if st.session_state.game_over:
+
+    st.divider()
+
+    if st.session_state.won:
+        st.balloons()
+        st.success("You got it!")
+    else:
+        st.error("Better luck next time!")
+
+    st.subheader(
+        f"The answer was {st.session_state.country}"
+    )
+
+    iso = str(table.iloc[0]["ISO"]).lower()
+
+    flag_url = f"https://flagcdn.com/h240/{iso}.png"
+
+    st.image(flag_url, width=250)
+
+    if st.button("🔄 Play Again"):
+        new_game()
         st.rerun()
-
-# Display guess count
-st.write(f"Guesses: {st.session_state.guesses}/6")
-
-# Reveal flag and answer
-if st.session_state.finished:
-
-    for x in table["ISO"]:
-        iso = x.lower()
-        flag_url = f"https://flagcdn.com/h240/{iso}.png"
-
-        try:
-            response = urllib.request.urlopen(flag_url)
-            display_image = Image.open(BytesIO(response.read()))
-            st.image(display_image)
-        except Exception:
-            st.write("Could not load flag image.")
-
-        break
-
-    for x in table["Country"]:
-        st.write(f"Answer: {x}")
-        break
-
-    if st.button("Play again"):
-        st.session_state.clear()
-        st.rerun()
-'''
-import pandas as pd
-import plotly.graph_objects as go
-import random
-import numpy as np
-import urllib.request
-from PIL import Image
-from IPython.display import display
-from difflib import SequenceMatcher
-from operator import itemgetter
-
-table = pd.read_csv("flagtable.csv")
-table["rgb"]=table["r"].astype(str)+","+table["g"].astype(str)+","+table["b"].astype(str) #concatenate rgb fields
-
-table.loc[table["rgb"]=="0,0,0", "r"] = 1 #0,0,0=black, but it doesn't show up unless it's shifted to 1,1,1
-table.loc[table["rgb"]=="0,0,0", "g"] = 1
-table.loc[table["rgb"]=="0,0,0", "b"] = 1
-
-def rgb_to_hex(rgb): #convert RGB to hex for filling points
-    r, g, b = map(int, rgb.split(","))
-    return f"#{r:02x}{g:02x}{b:02x}"
-
-table["rgb"]=table["rgb"].apply(rgb_to_hex)
-allcountries=table
-table = table.loc[table["Country"] == str(random.choice(table["Country"]))] #pick a random country
-table = table.loc[table["%"]>= 0.1] #filter out tiny pixel values from the PNG compression
-table.loc[table["%"]<=1, ["%"]] = 3 #make tiny colours more visible by making anything less than 1% 3%
-table=table.sort_values(by='%',ascending=False) #put smaller points over larger ones for visibility
-
-fig = go.Figure()
-fig.add_trace(go.Scatterternary(
-    a=table["r"],b=table["g"], c=table["b"], #r g and b axes
-    mode="markers+lines", #lines to join points together - makes tiny ones easier to see
-    #hovertext=table["Country"], #show country name on hover
-
-    marker=dict(color=table["rgb"],size=table["%"]/100,opacity=1),
-    line=dict(color="lightgray"),text="",textposition="middle center"))
-
-fig.update_ternaries(aaxis_title="Red",baxis_title="Green",caxis_title="Blue") #axis titles
-fig.update_layout(width=1000, height=1000) # make chart bigger
-fig.show()
-for x in table["Country"]:
-    c=x.upper() #make country names uppercase
-
-countries=[] #get list of country names to match against
-for i in allcountries["Country"]:
-        countries.append(i.upper())
-
-
-
-guesses=0
-while guesses<6:
-    guess=input("\nEnter guess here: ") #enter guess
-    guess=guess.upper() #make guess uppercase
-
-    if guess not in countries: #reject if country not in list
-        print("\nNot a valid country")
-        matches=[]
-        for country in countries: #look for countries with similar names
-            res = SequenceMatcher(None, guess.upper(), country.upper()).ratio()
-            match=({"country":country,"res":res})
-            if match not in matches:
-                matches.append(match)
-        matches = sorted(matches, key=itemgetter('res'), reverse=True) #sort list of countries by similarity
-        print("Did you mean?")
-        matches=matches[:3] #choose top 3 most similar countries
-        for m in matches: #print top 3
-            print(m["country"])
-
-    elif guess ==c: #if guess is correct
-        guesses+=1
-        print(f"Correct! You guessed the flag in {guesses} guesses.")
-
-        break
-
-    else: #if guess is wrong
-        guesses+=1
-
-
-for x in table["ISO"]:
-    iso=x.lower() #flagpedia filenames are lowercase iso.png
-    urllib.request.urlretrieve(f'https://flagcdn.com/h240/{iso}.png', "flagpic.png") #get picture of flag
-    display(Image.open("flagpic.png")) #show picture
-    break
-for x in table["Country"]:
-    print(f"\nAnswer: {x}")
-    break
-    '''
-
