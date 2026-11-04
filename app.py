@@ -32,13 +32,6 @@ def load_data():
     table["b"] = pd.to_numeric(table["b"])
 
     # Make black visible
-    black = (
-        (table["r"] == 0) &
-        (table["g"] == 0) &
-        (table["b"] == 0)
-    )
-
-    table.loc[black, ["r", "g", "b"]] = 1
 
     # Convert RGB to hexadecimal
     table["rgb"] = table.apply(
