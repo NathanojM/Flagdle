@@ -8,7 +8,7 @@ from IPython.display import display
 from difflib import SequenceMatcher
 from operator import itemgetter
 
-table = pd.read_csv("flagtable.csv")
+table = pd.read_csv("flagrgb.csv")
 table["rgb"]=table["r"].astype(str)+","+table["g"].astype(str)+","+table["b"].astype(str) #concatenate rgb fields
 
 table.loc[table["rgb"]=="0,0,0", "r"] = 1 #0,0,0=black, but it doesn't show up unless it's shifted to 1,1,1
