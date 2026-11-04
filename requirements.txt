@@ -2,3 +2,5 @@ pandas
 plotly
 numpy
 Ipython
+streamlit
+Pillow
