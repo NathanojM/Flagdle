@@ -37,7 +37,7 @@ fig.add_trace(go.Scatterternary(
 
 fig.update_ternaries(aaxis_title="Red",baxis_title="Green",caxis_title="Blue") #axis titles
 fig.update_layout(width=1000, height=1000) # make chart bigger
-
+fig.show()
 for x in table["Country"]:
     c=x.upper() #make country names uppercase
 
