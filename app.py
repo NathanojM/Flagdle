@@ -12,12 +12,21 @@ from io import BytesIO
 st.title("Guess the Flag")
 
 table = pd.read_csv("flagtable.csv")
+
+
+table["rgb"] = table["r"].astype(str)+","+table["g"].astype(str)+","+table["b"].astype(str)
+table.loc[table["rgb"]=="0,0,0", ["r", "g", "b"]] = 1
+table["rgb"] = table.apply(
+    lambda row: f"#{int(row['r']):02x}{int(row['g']):02x}{int(row['b']):02x}",
+    axis=1
+)
+'''
 table["rgb"] = table["r"].astype(str)+","+table["g"].astype(str)+","+table["b"].astype(str)
 
 table.loc[table["rgb"]=="0,0,0", "r"] = 1
 table.loc[table["rgb"]=="0,0,0", "g"] = 1
 table.loc[table["rgb"]=="0,0,0", "b"] = 1
-
+'''
 def rgb_to_hex(rgb):
     r, g, b = map(int, rgb.split(","))
     return f"#{r:02x}{g:02x}{b:02x}"
